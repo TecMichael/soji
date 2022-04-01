@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:roomies_app/screens/login_screen.dart';
 
 import '../components/register_form.dart';

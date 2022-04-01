@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:roomies_app/components/register_form.dart';
+import 'package:roomies_app/screens/dashboard.dart';
 import 'package:roomies_app/screens/registration.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -57,6 +58,7 @@ class LoginScreen extends StatelessWidget {
             child: MaterialButton(
               elevation: 10,
               onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_)=>const DashboardScreen()));
                 // ignore: prefer_const_constructors
               },
               child: const Text(
