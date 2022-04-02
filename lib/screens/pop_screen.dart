@@ -26,6 +26,113 @@ class PopScreen extends StatelessWidget {
                 ),
               ],
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        children: const [
+                          Text(
+                            'Match',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '20 Suspicious',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            'Contents',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: const [
+                      Text(
+                        "johndoe@yahoo.com",
+                        style: TextStyle(
+                          color: Color(0xffff6600),
+                          fontSize: 24,
+                          fontFamily: "Montserrat",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        "Tuesday,  18 I 07 I 2021",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Icon(
+                        Icons.share_rounded,
+                        color: Color(0xffff6600),
+                      )
+                    ],
+                  ),
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: const [
+                      Icon(
+                        Icons.rectangle,
+                        color: Color(0xffff6600),
+                        size: 15,
+                      ),
+                      Text('e-mail'),
+                      Icon(
+                        Icons.rectangle,
+                        color: Color.fromARGB(255, 241, 146, 82),
+                        size: 15,
+                      ),
+                      Text('phone'),
+                      Icon(
+                        Icons.rectangle,
+                        color: Color.fromARGB(255, 236, 178, 140),
+                        size: 15,
+                      ),
+                      Text('link')
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           Container(
