@@ -122,6 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
               height: 56,
             ),
           ),
+          const SizedBox(height: 10),
         ],
       ),
     );
