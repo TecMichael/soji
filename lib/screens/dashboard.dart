@@ -1,198 +1,401 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:another_flushbar/flushbar.dart';
+import 'package:call_log/call_log.dart';
+import 'package:caller/caller.dart';
+import 'package:clipboard_listener/clipboard_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mixpanel_flutter/mixpanel_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:roomies_app/bloc/post_bloc/event.dart';
+import 'package:roomies_app/components/progress_content.dart';
+import 'package:roomies_app/model/responses/company_search_response.dart';
 import 'package:roomies_app/screens/search_screen.dart';
+import 'package:roomies_app/screens/splash_screen.dart';
 
-import '../components/progress_content.dart';
+import '../bloc/post_bloc/bloc.dart';
+import '../bloc/post_bloc/state.dart';
+import '../components/custom_dialog.dart';
+import '../components/custom_exit_dialog.dart';
+import '../main.dart';
+import '../model/responses/generic_response.dart';
+import '../services/api_service.dart';
+import '../services/cache_helper.dart';
+import '../services/notification_service.dart';
+import '../utility/user_store.dart';
+import 'report_screen.dart';
+import 'package:telephony/telephony.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+Future<void> callerCallbackHandler(
+    CallerEvent event,
+    String number,
+    int duration,
+    ) async {
+  print("New event received from native $event");
+  switch (event) {
+    case CallerEvent.incoming:{
+
+      NotificationService.searchData(number);
+      print(
+          '[ Caller ] Incoming call ended, number: $number, duration $duration s');
+    }
+    break;
+    case CallerEvent.outgoing:{
+      NotificationService.searchData(number);
+      print(
+          '[ Caller ] Ougoing call ended, number: $number, duration: $duration s');
+    }
+    break;
+  }
+}
+
+class DashboardScreen extends StatefulWidget {
+ final CompanySearchResponse? response;
+  const DashboardScreen({Key? key,this.response}) : super(key: key);
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+
+  AppBloc? appBloc;
+
+  Future<void> _checkPermission() async {
+    // You can request multiple permissions at once.
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.sms,
+      Permission.phone,
+
+    ].request();
+
+    if (await Permission.phone.request().isGranted) {
+      _startCaller();
+      print('starting caller');
+    }else{
+      // You can request multiple permissions at once.
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.sms,
+        Permission.contacts,
+        Permission.phone,
+
+      ].request();
+    }
+  }
+
+  Future<void> _requestPermission() async {
+    await Caller.requestPermissions();
+    await _checkPermission();
+  }
+
+  Future<void> _stopCaller() async {
+    await Caller.stopCaller();
+  }
+
+  Future<void> _startCaller() async {
+    await Caller.initialize(callerCallbackHandler);
+  }
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    appBloc = BlocProvider.of<AppBloc>(context);
+    appBloc!.add(SearchUserRecordEvent(context: context));
+    _checkPermission();
+
+    ClipboardListener.addListener(() async {
+      print(' clipboard');
+      var text =
+      "${(await Clipboard.getData(Clipboard.kTextPlain))!.text}";
+      print(text+'from clipboard');
+
+      if(text.isNotEmpty){
+      NotificationService.searchData(text);
+      }
+
+    });
+
+    if(widget.response!=null){
+      // attempt to show dialog
+      Timer.run(() {
+        showDialog(context: context,
+            builder: (BuildContext context){
+              return CustomDialogBox(
+                result: widget.response!.response!.data![0],
+              );});
+      });
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
-      backgroundColor: const Color(0xffD8D6D6),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+      backgroundColor:  Colors.grey.shade100,
+      appBar: AppBar(
+        centerTitle:true,
+        backgroundColor: Colors.white,
+        bottom:  PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async{
+                 var result =   await  Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const SearchScreen()));
+                              builder: (_) =>  BlocProvider<AppBloc>(
+                                  create: (context) => AppBloc(apiService: ApiService()),
+                                  child: const SearchScreen())));
+                 if(result!=null){
+                   appBloc!.add(SearchUserRecordEvent(context: context));
+
+                 }
                     },
                     child: Container(
                       width: 55,
-                      height: 37,
+                      height: 50,
+                      padding: const EdgeInsets.only(right: 15,left:15),
+                      alignment: Alignment.centerRight,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: const Color(0xfffbfbfb),
+                        color:  Colors.grey.shade100,
                       ),
-                      child: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                        size: 26,
+                      child: Row(
+                        children: const [
+                          Text('Search by phone, email or links .....'),
+                          Spacer(),
+                          Icon(
+                            Icons.search,
+                            color: Colors.grey,
+                            size: 26,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+                )
+              ],
+            ),
+          ),
+        ),
+        elevation: 0,
+        leading:
+        IconButton(
+            onPressed: (){
+              exitDialog(context);
+
+            },
+            icon: const Icon(Icons.logout,color:Colors.black)),
+        title: Image.asset('assets/soji_logo.png',height: 20,),
+        actions: [
+
+          IconButton(
+              onPressed: (){
+                appBloc!.add(SearchUserRecordEvent(context: context));
+
+              },
+              icon: const Icon(Icons.refresh,color:Colors.black))
+        ],
+      ),
+
+      body: Container(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            BlocListener<AppBloc, AppState>(
+              listener: (context,state) async{
+                if(state is LoadingState || state is InitialState){
+
+                }else if(state is SignInPostedState){
+
+                }
+                else if(state is UserSearchCompletedState){
+                  if(state.companySearchResponse!.response!.data!.isEmpty) {
+                    Iterable<CallLogEntry> entries = await CallLog.get();
+                    var numbers =[];
+                    entries.toSet().toList().take(10).toList().forEach((element) {
+                      numbers.add(element.number);
+                    });
+                   await ApiService().searchCompanyByPhone(numbers.join(','));
+                    appBloc!.add(SearchUserRecordEvent(context: context));
+
+                  }
+                }
+                else if(state is LoadFailureState){
+                  Flushbar(
+                    message:state.error,
+                    flushbarStyle: FlushbarStyle.GROUNDED,
+                    duration: const Duration(seconds: 3),
+                  ).show(context);
+                }
+                else {
+                }
+              },
+              child:   BlocBuilder<AppBloc, AppState>(
+                builder: (context,state){
+                  if(state is LoadingState || state is InitialState){
+                   return Expanded(
+                     child: Center(
+                       child: Column(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: const [
+                           Padding(
+                             padding: EdgeInsets.only(top:20.0),
+                             child: SizedBox(height:30,width:30,child: Center(child: CircularProgressIndicator(color: Colors.deepOrangeAccent,))),
+                           ),
+                         ],
+                       ),
+                     ),
+                   );
+                  }else if(state is UserSearchCompletedState){
+                    if(state.companySearchResponse!.response!.data!.isNotEmpty ){
+                    return  Expanded(
+                      child: ListView.builder(
+                        itemCount:state.companySearchResponse!.response!.data!.length ,
+                          itemBuilder: (ctx,pos){
+                       return ProgressContent(result:state.companySearchResponse!.response!.data![pos]);
+                      }),
+                    );
+                    }else{
+                     return Container();
+                      // Expanded(
+                     //   child: Center(
+                     //     child: Column(
+                     //        mainAxisAlignment: MainAxisAlignment.center,
+                     //        crossAxisAlignment: CrossAxisAlignment.center,
+                     //        children: [
+                     //          SvgPicture.asset(
+                     //            'assets/soji_empty.svg',
+                     //            height: 100,
+                     //          ),
+                     //          const SizedBox(height: 10,),
+                     //          const Text('No Records Yet')
+                     //        ],
+                     //      ),
+                     //   ),
+                     // );
+                    }
+
+
+                  }
+                  else if(state is LoadFailureState){
+                         return   Container();
+                  }
+                  else {
+                    return   Container();
+
+                  }
+                },
               ),
+            ),
+
+
+
+          ],
+        ),
+      ),
+    );
+  }
+  exitDialog(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (context) => CustomExitDialog(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+
               const SizedBox(height: 25),
+
+              const Text( "Are you sure you want to exit the app?",
+
+              ),
+
+              const SizedBox(height: 30),
+
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-                height: 180,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 3,
-                      offset: const Offset(3, 2), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Column(
-                            children: const [
-                              Text(
-                                'Match',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                '20 Suspicious',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Contents',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Row(
-                        children: const [
-                          Text(
-                            "johndoe@yahoo.com",
-                            style: TextStyle(
-                              color: Color(0xffff6600),
-                              fontSize: 24,
-                              fontFamily: "Montserrat",
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 50),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            "Tuesday,  18 I 07 I 2021",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Icon(
-                            Icons.share_rounded,
-                            color: Color(0xffff6600),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: const [
-                          Icon(
-                            Icons.rectangle,
-                            color: Color(0xffff6600),
-                            size: 15,
-                          ),
-                          Text('e-mail'),
-                          Icon(
-                            Icons.rectangle,
-                            color: Color.fromARGB(255, 241, 146, 82),
-                            size: 15,
-                          ),
-                          Text('phone'),
-                          Icon(
-                            Icons.rectangle,
-                            color: Color.fromARGB(255, 236, 178, 140),
-                            size: 15,
-                          ),
-                          Text('link')
-                        ],
-                      ),
-                    )
-                  ],
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                child: MaterialButton(
+                  elevation: 0,
+                  color: Colors.black87,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Text( "Logout",
+                    style: GoogleFonts.josefinSans(
+                        textStyle:const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,)),
+                  ),
+                  onPressed: () async {
+                    try {
+
+                      CacheHelper().signOut();
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => BlocProvider<AppBloc>(
+                              create: (context) => AppBloc(apiService: ApiService()),
+                              child: const SplashScreen()),
+                          ));    } catch (e) {
+                      print("SIGN OUT ENDED WITH AN ERROR");
+                    }
+                  },
                 ),
               ),
-              const SizedBox(height: 15),
-              Column(
-                children: const [
-                  ProgressContent(
-                    text: "A-Z Bank",
-                    icn: Icons.phone,
+              const SizedBox(height: 20),
+
+              Container(
+                height: 50,
+                width: MediaQuery.of(context).size.width,
+                child: MaterialButton(
+                  elevation: 0,
+                  color: const Color(0xffFF6600).withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  SizedBox(height: 14),
-                  ProgressContent(
-                    text: "suspicious content",
-                    icn: Icons.sms_rounded,
+                  child: Text( "Cancel",
+                    style: GoogleFonts.josefinSans(
+                        textStyle:const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xffFF6600),
+                          fontWeight: FontWeight.w800,)
+                    ),
                   ),
-                  SizedBox(height: 14),
-                  ProgressContent(
-                    text: "content not found",
-                    icn: Icons.link,
-                  ),
-                  SizedBox(height: 14),
-                  ProgressContent(
-                    text: "content not found",
-                    icn: Icons.mail
-                  ),
-                ],
-              )
+                  onPressed: ()=> Navigator.pop(context),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
 }

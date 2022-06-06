@@ -1,77 +1,139 @@
+import 'dart:async';
+
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:roomies_app/screens/registration.dart';
 
-class SplashScreen extends StatelessWidget {
+import '../bloc/post_bloc/bloc.dart';
+import '../services/api_service.dart';
+import '../services/cache_helper.dart';
+import '../utility/user_store.dart';
+import 'dashboard.dart';
+import 'home_screen.dart';
+import 'login_screen.dart';
+import 'pop_screen.dart';
+import 'search_screen.dart';
+
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  CacheHelper _cacheHelper = CacheHelper();
+  bool? isUserLoggedIn = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      value: 0.0,
+      duration: const Duration(seconds: 2),
+      reverseDuration: const Duration(milliseconds: 75),
+      vsync: this,
+    )..addStatusListener((AnimationStatus status) {
+      setState(() {
+        // setState needs to be called to trigger a rebuild because
+        // the 'HIDE FAB'/'SHOW FAB' button needs to be updated based
+        // the latest value of [_controller.status].
+      });
+    });
+    if (_isAnimationRunningForwardsOrComplete) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+    _cacheHelper.isLoggedIn().then((value) => {
+      setState(() {
+        isUserLoggedIn = value;
+      }),
+
+      if(isUserLoggedIn!){
+        Provider.of<UserStore>(context,listen:false).fetchCurrentUser(),
+        startTime()
+      }
+      else{
+        startTime(),
+      }
+    });
+    super.initState();
+  }
+
+  bool get _isAnimationRunningForwardsOrComplete {
+    switch (_controller.status) {
+      case AnimationStatus.forward:
+      case AnimationStatus.completed:
+        return true;
+      case AnimationStatus.reverse:
+      case AnimationStatus.dismissed:
+        return false;
+    }
+  }
+
+
+  startTime() async {
+    var duration = new Duration(seconds: 3);
+    return new Timer(duration, route);
+  }
+
+  route() {
+    if (!isUserLoggedIn!) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => BlocProvider<AppBloc>(
+            create: (context) => AppBloc(apiService: ApiService()),
+            child: LoginScreen()),
+        ),
+      );
+    } else {
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => BlocProvider<AppBloc>(
+              create: (context) => AppBloc(apiService: ApiService()),
+              child: DashboardScreen()),
+          ));
+
+    }
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffD8D6D6),
+      backgroundColor:  Colors.white,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            'assets/splash.svg',
-          ),
-          const SizedBox(height: 25),
-          const SizedBox(
-            width: 466,
-            height: 60,
-            child: Text(
-              "Protect yourself from fraud",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontFamily: "Montserrat",
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(height: 1),
-          const SizedBox(
-            width: 280,
-            height: 92,
-            child: Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dignissim quam id venenatis integer donec ut consectetur quis pharetra. Aliquam accumsan ",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color(0x99000000),
-                fontSize: 13,
-              ),
-            ),
-          ),
-          const SizedBox(height: 38),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 70),
-            child: MaterialButton(
-              elevation: 10,
-              onPressed: () {
-                // ignore: prefer_const_constructors
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const RegistrationScreen()));
+          Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (BuildContext context, Widget? child) {
+                return FadeScaleTransition(
+                  animation: _controller,
+                  child: child,
+                );
               },
-              child: const Text(
-                "Get Started",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xfffffbfb),
-                  fontSize: 18,
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Image.asset(
+                'assets/soji_logo.png',
+                height: 100,
+                width: 200,
+
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              color: const Color(0xffFF6600),
-              minWidth: double.infinity,
-              height: 56,
             ),
           ),
+
+
         ],
       ),
     );
