@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class RegisterForm extends StatelessWidget {
-   RegisterForm({
-    Key? key,
-    required this.txt,
-     required this.controller,
-     this.isObscure=false,
-     this.inputType=TextInputType.text
-  }) : super(key: key);
+  const RegisterForm(
+      {Key? key,
+      required this.txt,
+      required this.controller,
+      this.isObscure = false,
+      this.inputType = TextInputType.text})
+      : super(key: key);
   final String txt;
   final TextEditingController controller;
   final bool isObscure;
@@ -18,35 +18,37 @@ class RegisterForm extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: TextFormField(
-        controller: controller ,
+        controller: controller,
         style: const TextStyle(color: Colors.black),
         obscureText: isObscure,
         decoration: InputDecoration(
           isDense: true,
           contentPadding:
-              const EdgeInsets.symmetric(vertical: 15.0, horizontal: 25.0),
+              const EdgeInsets.symmetric(vertical: 17.0, horizontal: 25.0),
           fillColor: Colors.white,
           filled: true,
           hintText: txt,
           focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(
-                Radius.circular(25),
+                Radius.circular(20),
               ),
               borderSide: BorderSide(color: Colors.grey)),
           border: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.all(
-              Radius.circular(25),
+              Radius.circular(20),
             ),
           ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-            borderRadius: BorderRadius.all(
-              Radius.circular(25),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(15),
             ),
           ),
           hintStyle: const TextStyle(
-              color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500),
+              color: Color.fromRGBO(60, 60, 60, 0.44),
+              fontSize: 15,
+              fontWeight: FontWeight.w500),
         ),
       ),
     );

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -13,26 +12,25 @@ import 'services/navigator_service.dart';
 import 'services/notification_service.dart';
 import 'utility/user_store.dart';
 
-onBackgroundMessage(SmsMessage message)  {
+onBackgroundMessage(SmsMessage message) {
   //Handle background message
   // You can also call other plugin in here
   NotificationService.searchData(message.address);
-  print(
-      '[ Message ] Ougoing call ended ${message.address}');
+  print('[ Message ] Ougoing call ended ${message.address}');
 }
 
-void main()  {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService.configLocalNotification();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then(
-        (_) => runApp(  MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => UserStore()),
-          ],
-          child:  MyApp(),
-        ),)
-  );
-
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)
+      .then((_) => runApp(
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (context) => UserStore()),
+              ],
+              child: MyApp(),
+            ),
+          ));
 }
 
 class MyApp extends StatefulWidget {
@@ -49,15 +47,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    if(Platform.isAndroid){
+    if (Platform.isAndroid) {
       telephony.listenIncomingSms(
-          onNewMessage: (SmsMessage message) {
-          },
+          onNewMessage: (SmsMessage message) {},
           listenInBackground: true,
-          onBackgroundMessage: onBackgroundMessage
-      );}
-    Provider.of<UserStore>(context,listen: false).initMixPanel();
-
+          onBackgroundMessage: onBackgroundMessage);
+    }
+    Provider.of<UserStore>(context, listen: false).initMixPanel();
   }
 
   // This widget is the root of your application.
@@ -65,11 +61,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+     
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.navigatorKey, // set property
-      theme: ThemeData(
-        primaryColor: Colors.deepOrangeAccent
-      ),
+      theme: ThemeData(primaryColor: Colors.deepOrangeAccent),
       // debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
     );

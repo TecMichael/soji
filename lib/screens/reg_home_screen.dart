@@ -1,17 +1,11 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:roomies_app/screens/registration.dart';
 
 import '../bloc/post_bloc/bloc.dart';
 import '../services/api_service.dart';
-import '../services/cache_helper.dart';
-import '../utility/user_store.dart';
-import 'home_screen.dart';
-import 'login_screen.dart';
 
 class RegHomeScreen extends StatefulWidget {
   const RegHomeScreen({Key? key}) : super(key: key);
@@ -74,7 +68,7 @@ class _RegHomeScreenState extends State<RegHomeScreen> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) =>   BlocProvider(
                       create: (_) => AppBloc(apiService: ApiService()),
-                      child:     RegistrationScreen(),
+                      child:     const RegistrationScreen(),
                     )));
               },
               child: const Text(

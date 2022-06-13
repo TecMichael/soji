@@ -1,5 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roomies_app/model/responses/company_search_response.dart';
@@ -23,7 +22,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.all(10),
+      insetPadding: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -36,15 +35,15 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     return Stack(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(left: 20,top: 35
+          padding: const EdgeInsets.only(left: 20,top: 35
               +29, right: 20,bottom: 20
           ),
-          margin: EdgeInsets.only(top: 35),
+          margin: const EdgeInsets.only(top: 35),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(color: Colors.black,offset: Offset(0,10),
                     blurRadius: 10
                 ),
@@ -54,19 +53,19 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             child:
             Center(child: Column(
               children: [
-                Container(
+                const SizedBox(
                     height: 20,
                     child: Text('Search Result ',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400,color: Colors.grey),)),
 
-                Container(
+                SizedBox(
                     height: 50,
-                    child: Text(widget.result!.description!,textAlign: TextAlign.center, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
+                    child: Text(widget.result!.description!,textAlign: TextAlign.center, style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
 
                 Column(
                   children: [
 
                     Container(height: 10),
-                    Divider(),
+                    const Divider(),
                     ListTile(
                       leading: const Icon(Icons.flag,color:Colors.redAccent),
                       title: const Text('Flag',style: TextStyle(color: Colors.redAccent),),
@@ -83,8 +82,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                               child: BlocProvider<AppBloc>(
                                   create: (context) => AppBloc(apiService: ApiService()),
                                   child:  ReportScreen(
-                                    title: '${widget.result!.searchedContent!}',
-                                    document: '${widget.result!.searchedContent!}',
+                                    title: widget.result!.searchedContent!,
+                                    document: widget.result!.searchedContent!,
                                   )),
                             );
                           },
@@ -110,8 +109,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                               child: BlocProvider<AppBloc>(
                                   create: (context) => AppBloc(apiService: ApiService()),
                                   child:  VerifyScreen(
-                                    title: '${widget.result!.searchedContent!}',
-                                    document: '${widget.result!.searchedContent!}',
+                                    title: widget.result!.searchedContent!,
+                                    document: widget.result!.searchedContent!,
                                   )),
                             );
                           },
@@ -127,7 +126,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                       onPressed: (){
                         Navigator.of(context).pop();
                       },
-                      child: Text('Close',style: TextStyle(fontSize: 18),)),
+                      child: const Text('Close',style: TextStyle(fontSize: 18),)),
                 ),
 
               ],
@@ -135,15 +134,15 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
           ),
         ),
-        Positioned(
+        const Positioned(
           left: 20,
           right: 20,
           child: CircleAvatar(
             backgroundColor:Colors.grey,
             radius: 35,
-            child: ClipRRect(
+            child:  ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(35)),
-                child: Icon(Icons.hourglass_empty,color: Colors.white,)
+                child:  Icon(Icons.hourglass_empty,color: Colors.white,)
             ),
           ),
         ),
@@ -155,15 +154,15 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     return Stack(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.only(left: 20,top: 35
+          padding: const EdgeInsets.only(left: 20,top: 35
               +29, right: 20,bottom: 20
           ),
-          margin: EdgeInsets.only(top: 35),
+          margin: const EdgeInsets.only(top: 35),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(color: Colors.black,offset: Offset(0,10),
                     blurRadius: 10
                 ),
@@ -173,23 +172,23 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             child:widget.result!.isScam!.toLowerCase()=='yes'?
             Center(child: Column(
               children: [
-                Container(
+                const SizedBox(
                     height: 20,
                     child: Text('Search Result ',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400,color: Colors.grey),)),
-                Container(
+                SizedBox(
                     height: 30,
-                    child: Text(widget.result!.searchedContent!,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,fontWeight: FontWeight.w400,color: Colors.grey),)),
+                    child: Text(widget.result!.searchedContent!,textAlign: TextAlign.center,style: const TextStyle(fontSize: 13,fontWeight: FontWeight.w400,color: Colors.grey),)),
 
-                Container(
+                SizedBox(
                   height: 50,
-                    child: Text(widget.result!.description!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
+                    child: Text(widget.result!.description!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: FlatButton(
                       onPressed: (){
                         Navigator.of(context).pop();
                       },
-                      child: Text('Close',style: TextStyle(fontSize: 18),)),
+                      child: const Text('Close',style: TextStyle(fontSize: 18),)),
                 ),
 
               ],
@@ -199,41 +198,41 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
               children: <Widget>[
                 Row(
                   children: [
-                    Text('Business Name:'),
-                    Expanded(child: Text(widget.result!.dataset!.companyName!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
+                    const Text('Business Name:'),
+                    Expanded(child: Text(widget.result!.dataset!.companyName!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
                   ],
                 ),
-                SizedBox(height: 15,),
+                const SizedBox(height: 15,),
                 Row(
                   children: [
-                    Text('Phone:'),
-                    Expanded(child:  Text(widget.result!.dataset!.phoneNumber!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),),
+                    const Text('Phone:'),
+                    Expanded(child:  Text(widget.result!.dataset!.phoneNumber!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),),
                   ],
                 ),
-                SizedBox(height: 15,),
+                const SizedBox(height: 15,),
                 Row(
                   children: [
-                    Text('Email:'),
-                    Expanded(child: Text(widget.result!.dataset!.email!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
+                    const Text('Email:'),
+                    Expanded(child: Text(widget.result!.dataset!.email!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
                         ),
                   ],
                 ),
-                SizedBox(height: 15,),
+                const SizedBox(height: 15,),
                 Row(
                   children: [
-                    Text('Website:'),
-                    Expanded(child: Text(widget.result!.dataset!.website!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
+                    const Text('Website:'),
+                    Expanded(child: Text(widget.result!.dataset!.website!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
                     ),
                   ],
                 ),
-                SizedBox(height: 15,),
+                const SizedBox(height: 15,),
                 Row(
                   children: [
-                    Text('City:'),
-                    Expanded(child: Text(widget.result!.dataset!.city!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
+                    const Text('City:'),
+                    Expanded(child: Text(widget.result!.dataset!.city!,style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
                     ),
                   ],
-                ),              SizedBox(height: 22,),
+                ),              const SizedBox(height: 22,),
 
                 Text(widget.result!.isScam!.toLowerCase()=='no'?'No scam records associated with this company' :'We have found some suspicious records about this company',style: TextStyle(fontSize: 14,color:widget.result!.isScam!.toLowerCase()=='no'?Colors.green: Colors.red,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
 
@@ -243,7 +242,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                       onPressed: (){
                         Navigator.of(context).pop();
                       },
-                      child: Text('Close',style: TextStyle(fontSize: 18),)),
+                      child: const Text('Close',style:  TextStyle(fontSize: 18),)),
                 ),
               ],
             ),
@@ -256,7 +255,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             backgroundColor:widget.result!.isScam!.toLowerCase()=='no'?Colors.green: Colors.red,
             radius: 35,
             child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(35)),
+                borderRadius: const BorderRadius.all(Radius.circular(35)),
                 child: Icon(widget.result!.isScam!.toLowerCase()=='no'? Icons.done:Icons.error_outline,color: Colors.white,)
             ),
           ),

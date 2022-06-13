@@ -1,20 +1,18 @@
 import 'package:another_flushbar/flushbar.dart';
-import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'package:provider/provider.dart';
 import 'package:roomies_app/components/register_form.dart';
 import 'package:roomies_app/screens/dashboard.dart';
-import 'package:roomies_app/screens/registration.dart';
+import 'package:roomies_app/screens/forgot_password.dart';
 
 import '../bloc/post_bloc/bloc.dart';
 import '../bloc/post_bloc/event.dart';
 import '../bloc/post_bloc/state.dart';
 import '../services/api_service.dart';
 import '../utility/user_store.dart';
-import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -24,7 +22,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool? isLoading=false;
+  bool? isLoading = false;
   AppBloc? appBloc;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -33,170 +31,218 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     appBloc = BlocProvider.of<AppBloc>(context);
 
-    Provider.of<UserStore>(context,listen: false).mixpanel!.track('Opened Login Screen', properties: {});
+    // Provider.of<UserStore>(context,listen: false).mixpanel!.track('Opened Login Screen', properties: {});
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Image.asset(
+          'assets/soji_logo.png',
+          scale: 5,
+          height: 45,
+          width: 115,
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xffff6600)),
+      ),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
+          child: BlocListener<AppBloc, AppState>(
+            listener: (context, state) async {
+              if (state is LoadingState || state is InitialState) {
+                setState(() {
+                  isLoading = true;
+                });
+              } else if (state is SignInPostedState) {
+                setState(() {
+                  isLoading = false;
+                });
 
-    return  Scaffold(
-      backgroundColor: const Color(0xffD8D6D6),
-      body: Container(
-       height:MediaQuery.of(context).size.height,
-        child: Center(
-          child: SingleChildScrollView(
-            child: BlocListener<AppBloc, AppState>(
-              listener: (context,state) async {
-                if(state is LoadingState || state is InitialState){
-                  setState(() {
-                    isLoading=true;
-                  });
-                }else if(state is SignInPostedState) {
-                  setState(() {
-                    isLoading=false;
-                  });
+                Flushbar(
+                  message: 'Login Successful',
+                  flushbarStyle: FlushbarStyle.GROUNDED,
+                  duration: const Duration(seconds: 3),
+                ).show(context);
+                Provider.of<UserStore>(context, listen: false)
+                    .fetchCurrentUser();
+                // Provider.of<UserStore>(context,listen: false).mixpanel!.track('Login Success');
 
-                  Flushbar(
-                    message:'Login Successful',
-                    flushbarStyle: FlushbarStyle.GROUNDED,
-                    duration: Duration(seconds: 3),
-                  ).show(context);
-                  Provider.of<UserStore>(context,listen:false).fetchCurrentUser();
-                  Provider.of<UserStore>(context,listen: false).mixpanel!.track('Login Success');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                            create: (_) => AppBloc(apiService: ApiService()),
+                            child: const DashboardScreen(),
+                          )),
+                );
+              } else if (state is LoadFailureState) {
+                Flushbar(
+                  message: 'Incorrect credentials',
+                  flushbarStyle: FlushbarStyle.GROUNDED,
+                  duration: const Duration(seconds: 3),
+                ).show(context);
 
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BlocProvider(
-                      create: (_) => AppBloc(apiService: ApiService()),
-                      child:     DashboardScreen(),
-                    )),
-                  );
-
-                }
-                else if(state is LoadFailureState){
-                  Flushbar(
-                    message:'Incorrect credentials',
-                    flushbarStyle: FlushbarStyle.GROUNDED,
-                    duration: Duration(seconds: 3),
-                  ).show(context);
-
-                  setState(() {
-                    isLoading=false;
-                  });
-                }
-                else {
-                  setState(() {
-                    isLoading=false;
-                  });
-                }
-              },
-              child: SafeArea(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                  color: const Color(0xffD8D6D6),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        height: 50,
-                        child: Text(
-                          "Welcome Back!",
+                setState(() {
+                  isLoading = false;
+                });
+              } else {
+                setState(() {
+                  isLoading = false;
+                });
+              }
+            },
+            child: SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Sign In",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xffFF6600),
+                        fontSize: 25,
+                        fontFamily: "Montserrat",
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8.84),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          "Lorem ipsum dolor sit amet, consectetur ",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
-                            fontFamily: "Montserrat",
-                            fontWeight: FontWeight.w700,
+                            color: Color(0x99000000),
+                            fontSize: 14,
                           ),
                         ),
-                      ),
-                      SvgPicture.asset(
-                        'assets/register.svg',
-                      ),
-                      const SizedBox(height: 17),
-                      RegisterForm(txt: 'Email',controller: emailController,  inputType: TextInputType.phone,
-                      ),
-                      RegisterForm(txt: 'Password',controller: passwordController,isObscure:true),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Row(
-                          children: const [
-                            Text(
-                              "Forgot Password?",
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    RegisterForm(
+                      txt: 'Enter your Email',
+                      controller: emailController,
+                      inputType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 10),
+                    RegisterForm(
+                        txt: 'Enter your Password',
+                        controller: passwordController,
+                        isObscure: true),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BlocProvider<AppBloc>(
+                                        create: (context) =>
+                                            AppBloc(apiService: ApiService()),
+                                        child: const ForgotPassword()),
+                                  ));
+                            },
+                            child: const Text(
+                              "Forgotten Password?",
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Color(0xffFF6600),
                                 fontSize: 14,
                               ),
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 72),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 70, vertical: 70),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xffff6600).withOpacity(0.4),
+                              blurRadius: 9.5,
+                              offset: const Offset(0, 8),
+                            ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 38),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 70),
                         child: MaterialButton(
-                          elevation: 10,
                           onPressed: () {
                             appBloc!.add(SignInEvent(
-                                email: emailController.text,
-                                password: passwordController.text,
-
+                              email: emailController.text,
+                              password: passwordController.text,
                             ));
                           },
-                          child: isLoading!?SizedBox(
-                              width: 25,
-                              height: 25,
-                              child: CircularProgressIndicator(color:Colors.white)) : const Text(
-                            "Log In",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xfffffbfb),
-                              fontSize: 18,
-                              fontFamily: "Poppins",
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          child: isLoading!
+                              ? const SizedBox(
+                                  width: 25,
+                                  height: 25,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white))
+                              : const Text(
+                                  "Log In",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0xfffffbfb),
+                                    fontSize: 15,
+                                    fontFamily: "Open Sans",
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(35),
                           ),
                           color: const Color(0xffFF6600),
                           minWidth: double.infinity,
-                          height: 45,
+                          height: 60,
                         ),
                       ),
-                      const SizedBox(height: 18),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) =>   BlocProvider(
-                                create: (_) => AppBloc(apiService: ApiService()),
-                                child:     RegistrationScreen(),
-                              )));
-                        },
-                        child: RichText(
-                          text: const TextSpan(
-                            text: 'Do not have an account?',
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black),
-                            children: [
-                              TextSpan(
-                                text: ' Sign Up',
-                                style: TextStyle(
-                                    color: Color(0xffFF6600), fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Lorem ipsum dolor sit onsectetur adipiscing',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.openSans(
+                              fontWeight: FontWeight.w400, fontSize: 13),
                         ),
-                      ),
-
-
-
-                    ],
-                  ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'eliLorem ipsum dolor ',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.openSans(
+                              color: const Color(0xffFF6600),
+                              fontWeight: FontWeight.w400,
+                              fontSize: 13),
+                        ),
+                        Text(
+                          ' sit onsectetur g eli',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.openSans(
+                              fontWeight: FontWeight.w400, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
