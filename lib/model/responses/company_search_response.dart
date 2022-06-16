@@ -52,8 +52,14 @@ class SearchResultModel {
   String? searchedContent;
   String? description;
   Dataset? dataset;
+  String? isLogin;
 
-  SearchResultModel({this.isScam, this.searchedContent, this.description, this.dataset});
+  SearchResultModel(
+      {this.isScam,
+        this.searchedContent,
+        this.description,
+        this.dataset,
+        this.isLogin});
 
   SearchResultModel.fromJson(Map<String, dynamic> json) {
     isScam = json['isScam'];
@@ -61,6 +67,7 @@ class SearchResultModel {
     description = json['description'];
     dataset =
     json['dataset'] != null ? new Dataset.fromJson(json['dataset']) : null;
+    isLogin = json['isLogin'];
   }
 
   Map<String, dynamic> toJson() {
@@ -71,47 +78,82 @@ class SearchResultModel {
     if (this.dataset != null) {
       data['dataset'] = this.dataset!.toJson();
     }
+    data['isLogin'] = this.isLogin;
     return data;
   }
 }
 
 class Dataset {
   int? id;
-  String? companyName,description;
+  String? companyName;
   String? phoneNumber;
-  String? email;
-  String? city;
-  String? website;
-  String? content;
-  String? type;
-  Null? addedBy;
-  String? dateAdded;
+  Null? email;
+  Null? city;
+  Null? website;
+  String? pageHandle;
+  Null? token;
+  String? subEmail;
+  String? subPhones;
+  Null? password;
+  String? verified;
+  String? signupMode;
+  String? claimed;
+  int? visitorCount;
+  Null? companyDocument;
+  String? dateInserted;
+  String? dateCreated;
+  String? dateVerified;
+  int? country;
+  Null? about;
+  String? dateCancelled;
 
   Dataset(
       {this.id,
-        this.description,
         this.companyName,
         this.phoneNumber,
         this.email,
         this.city,
         this.website,
-        this.content,
-        this.type,
-        this.addedBy,
-        this.dateAdded});
+        this.pageHandle,
+        this.token,
+        this.subEmail,
+        this.subPhones,
+        this.password,
+        this.verified,
+        this.signupMode,
+        this.claimed,
+        this.visitorCount,
+        this.companyDocument,
+        this.dateInserted,
+        this.dateCreated,
+        this.dateVerified,
+        this.country,
+        this.about,
+        this.dateCancelled});
 
   Dataset.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     companyName = json['companyName'];
     phoneNumber = json['phoneNumber'];
     email = json['email'];
-    description = json['description'];
     city = json['city'];
     website = json['website'];
-    content = json['content'];
-    type = json['type'];
-    addedBy = json['addedBy'];
-    dateAdded = json['dateAdded'];
+    pageHandle = json['pageHandle'];
+    token = json['token'];
+    subEmail = json['subEmail'];
+    subPhones = json['subPhones'];
+    password = json['password'];
+    verified = json['verified'];
+    signupMode = json['signupMode'];
+    claimed = json['claimed'];
+    visitorCount = json['visitorCount'];
+    companyDocument = json['companyDocument'];
+    dateInserted = json['dateInserted'];
+    dateCreated = json['dateCreated'];
+    dateVerified = json['dateVerified'];
+    country = json['country'];
+    about = json['about'];
+    dateCancelled = json['dateCancelled'];
   }
 
   Map<String, dynamic> toJson() {
@@ -120,13 +162,24 @@ class Dataset {
     data['companyName'] = this.companyName;
     data['phoneNumber'] = this.phoneNumber;
     data['email'] = this.email;
-    data['description'] = this.description;
     data['city'] = this.city;
     data['website'] = this.website;
-    data['content'] = this.content;
-    data['type'] = this.type;
-    data['addedBy'] = this.addedBy;
-    data['dateAdded'] = this.dateAdded;
+    data['pageHandle'] = this.pageHandle;
+    data['token'] = this.token;
+    data['subEmail'] = this.subEmail;
+    data['subPhones'] = this.subPhones;
+    data['password'] = this.password;
+    data['verified'] = this.verified;
+    data['signupMode'] = this.signupMode;
+    data['claimed'] = this.claimed;
+    data['visitorCount'] = this.visitorCount;
+    data['companyDocument'] = this.companyDocument;
+    data['dateInserted'] = this.dateInserted;
+    data['dateCreated'] = this.dateCreated;
+    data['dateVerified'] = this.dateVerified;
+    data['country'] = this.country;
+    data['about'] = this.about;
+    data['dateCancelled'] = this.dateCancelled;
     return data;
   }
 }

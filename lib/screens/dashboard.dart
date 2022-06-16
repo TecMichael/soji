@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:roomies_app/bloc/post_bloc/event.dart';
@@ -166,7 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Row(
                         children: [
                           Text(
-                            'Search by phone, email or links .....',
+                            'Search ',
                             style: TextStyle(color: Colors.grey.shade500),
                           ),
                           const Spacer(),
@@ -184,8 +185,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () {
             exitDialog(context);
           },
-          icon: const Icon(
-            Icons.logout,
+          icon:  SvgPicture.asset(
+            'assets/logout.svg',
             color: Color(0xffFF6600),
           ),
         ),
@@ -198,8 +199,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               appBloc!.add(SearchUserRecordEvent(context: context));
             },
-            icon: const Icon(
-              Icons.refresh,
+            icon:SvgPicture.asset(
+              'assets/refresh.svg',
               color: Color(0xffFF6600),
             ),
           )

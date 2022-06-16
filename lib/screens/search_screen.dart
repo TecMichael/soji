@@ -55,12 +55,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               });
           if (state.companySearchResponse!.response!.data![0].dataset != null) {
-            Provider.of<UserStore>(context, listen: false)
-                .mixpanel!
-                .track('Search Action', properties: {
-              'content': state
-                  .companySearchResponse!.response!.data![0].dataset!.content
-            });
+            // Provider.of<UserStore>(context, listen: false)
+            //     .mixpanel!
+            //     .track('Search Action', properties: {
+            //   'content': state
+            //       .companySearchResponse!.response!.data![0].dataset!.content
+            // });
           }
         } else if (state is LoadFailureState) {
           Flushbar(
@@ -83,24 +83,17 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: AppBar(
             centerTitle: true,
             backgroundColor: Colors.white,
+
             leading: IconButton(
               icon: const Icon(
-                Icons.arrow_back_ios_rounded,
+                Icons.arrow_back,
                 color: Color(0xffFF6600),
               ),
               onPressed: () {
                 Navigator.of(context).pop(hasSearchHappened);
               },
             ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.only(right: 15),
-                child: Icon(
-                  Icons.refresh,
-                  color: Color(0xffFF6600),
-                ),
-              ),
-            ],
+
             elevation: 0,
             title: Image.asset(
               'assets/soji_logo.png',
@@ -161,7 +154,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   style: TextStyle(
                                       color: isSelected == 1
                                           ? Colors.white
-                                          : Colors.black),
+                                          : Color(0xffFF6600)),
                                 ),
                               ],
                             ))),
@@ -206,7 +199,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   style: TextStyle(
                                       color: isSelected == 2
                                           ? Colors.white
-                                          : Colors.black),
+                                          : Color(0xffFF6600)),
                                 ),
                               ],
                             ))),
@@ -250,7 +243,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   style: TextStyle(
                                       color: isSelected == 0
                                           ? Colors.white
-                                          : Colors.black),
+                                          : Color(0xffFF6600)),
                                 ),
                               ],
                             ))),
