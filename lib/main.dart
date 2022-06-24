@@ -11,16 +11,27 @@ import 'screens/home_screen.dart';
 import 'services/navigator_service.dart';
 import 'services/notification_service.dart';
 import 'utility/user_store.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
+import 'package:shared_preferences_ios/shared_preferences_ios.dart';
+
 
 onBackgroundMessage(SmsMessage message) {
   //Handle background message
   // You can also call other plugin in here
+  if(message.body!.trim().isNotEmpty){
   NotificationService.searchData(message.address);
   print('[ Message ] Ougoing call ended ${message.address}');
+
+  }
 }
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    SharedPreferencesAndroid.registerWith();
+  } else if (Platform.isIOS) {
+    SharedPreferencesIOS.registerWith();
+  }
   NotificationService.configLocalNotification();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)
       .then((_) => runApp(
@@ -53,7 +64,7 @@ class _MyAppState extends State<MyApp> {
           listenInBackground: true,
           onBackgroundMessage: onBackgroundMessage);
     }
-    Provider.of<UserStore>(context, listen: false).initMixPanel();
+    // Provider.of<UserStore>(context, listen: false).initMixPanel();
   }
 
   // This widget is the root of your application.

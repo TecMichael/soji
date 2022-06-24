@@ -74,10 +74,14 @@ class NotificationService extends StatelessWidget {
     print('searching number');
     ApiService apiService = ApiService();
     try{
+      print('enter try');
+
       var responseString;
       if(val.contains('@')){
         responseString = await apiService.searchCompanyByEmail(val);
       }else{
+        print('is phone');
+
         responseString = await apiService.searchCompanyByPhone(val);
       }
       var data = json.decode(responseString);
@@ -90,13 +94,9 @@ class NotificationService extends StatelessWidget {
         CompanySearchResponse response = CompanySearchResponse.fromJson(data);
         // yield CompanySearchedState(
         //     companySearchResponse: response);
-        if(response.response!.data!.isNotEmpty) {
-
-
+        if(response.response!.data!.isNotEmpty && response.response!.data![0].isScam!.toLowerCase()=='yes') {
             NotificationService.showNotification(response.response!.data![0].searchedContent!,
                 '${response.response!.data![0].description!} \n Click to view more details',json.encode(response));
-
-
         }else{
           print('data empty');
         }

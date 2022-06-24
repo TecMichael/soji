@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -26,6 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
   int lines = 1;
   TextInputType? inputType;
   bool? hasSearchHappened;
+  Country? selectedCountry;
   @override
   void initState() {
     super.initState();
@@ -252,45 +254,129 @@ class _SearchScreenState extends State<SearchScreen> {
                   ],
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: TextFormField(
-                  controller: searchController,
-                  // keyboardType: inputType,
-                  style: const TextStyle(color: Colors.black),
-                  minLines: lines,
-                  maxLines: lines,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 25.0),
-                    fillColor: Colors.white,
-                    filled: true,
-                    hintText: hint,
-                    focusedBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(25),
+              Row(
+                children: [
+                  isSelected==1? Expanded(
+                    flex: 3,
+                    child: GestureDetector(
+                      onTap: () {
+                        showCountryPicker(
+                          context: context,
+                          showPhoneCode: true,
+                          countryListTheme: CountryListThemeData(
+                            flagSize: 25,
+                            backgroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                                fontSize: 16, color: Colors.blueGrey),
+                            bottomSheetHeight:
+                            600, // Optional. Country list modal height
+                            //Optional. Sets the border radius for the bottomsheet.
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(10.0),
+                            ),
+                            //Optional. Styles the search field.
+                            inputDecoration: InputDecoration(
+                              labelText: 'Search',
+                              hintText: 'Start typing to search',
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: const Color(0xFF8C98A8)
+                                      .withOpacity(0.2),
+                                ),
+                              ),
+                            ),
+                          ),
+                          onSelect: (Country country) {
+                            setState(() {
+                              selectedCountry = country;
+                            });
+                          },
+                        );
+                      },
+                      child: Container(
+                        height: 60,
+
+                        margin:
+                        const EdgeInsets.only(left: 12, right: 2),
+                        decoration: BoxDecoration(
+                            border:
+                            Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5),
+                                child: Text(
+                                    selectedCountry == null
+                                        ? 'Country'
+                                        : '+' +
+                                        selectedCountry!.phoneCode,
+                                    style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500)),
+                              ),
+                            const SizedBox(width: 2),
+                              const Icon(
+                                Icons.arrow_drop_down,
+                                size: 20,
+                                color: Color(0xffFF6600),
+                              )
+                            ],
+                          ),
                         ),
-                        borderSide: BorderSide(color: Colors.grey)),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25),
                       ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(15),
+                  ):Container(),
+                  Expanded(
+                    flex: 8,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: TextFormField(
+                        controller: searchController,
+                        // keyboardType: inputType,
+                        style: const TextStyle(color: Colors.black),
+                        minLines: lines,
+                        maxLines: lines,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 20.0, horizontal: 25.0),
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: hint,
+                          focusedBorder: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(25),
+                              ),
+                              borderSide: BorderSide(color: Colors.grey)),
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(25),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                          hintStyle: const TextStyle(
+                              color: Colors.black45,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400),
+                        ),
                       ),
                     ),
-                    hintStyle: const TextStyle(
-                        color: Colors.black45,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400),
                   ),
-                ),
+                ],
               ),
 
               Padding(
@@ -299,8 +385,19 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: MaterialButton(
                   elevation: 10,
                   onPressed: () {
+                    if(isSelected==1 && selectedCountry==null){
+                      Flushbar(message: 'Please choose a country',duration: Duration(seconds: 1),).show(context);
+                    }else{
+
+                      if(isSelected==1){
+                        appBloc!.add(SearchCompanyEvent(
+                            data:'+'+selectedCountry!.phoneCode.toString()+ searchController.text, type: 0));
+                      }
+                      else{
                     appBloc!.add(SearchCompanyEvent(
                         data: searchController.text, type: 0));
+                      }
+                    }
                   },
                   child: isLoading!
                       ? const SizedBox(

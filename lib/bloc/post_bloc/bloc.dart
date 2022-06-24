@@ -73,7 +73,7 @@ Stream<AppState> mapEventToState(AppEvent event) async* {
 
   if (event is SearchCompanyEvent) {
     yield LoadingState();
-    if(event.data!.isNotEmpty){
+    if(event.data!.trim().isNotEmpty){
     try{
       var responseString;
       if(event.data!.contains('@')){
@@ -116,6 +116,7 @@ Stream<AppState> mapEventToState(AppEvent event) async* {
     yield LoadingState();
     try{
      var user = Provider.of<UserStore>(event.context!,listen:false).currUser;
+
 
   var responseString = await apiService.searchUserRecord(user!.token);
   print('not token'+user.token!);

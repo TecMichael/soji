@@ -76,8 +76,8 @@ class CacheHelper{
 
   // checks shared preferences and fetches the user data saved there
   Future<SignInResponse> getCurrentUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userJson = prefs.getString("LOGGED_IN_USER");
+    await openCache();
+    String? userJson = prefs!.getString("LOGGED_IN_USER");
     var data = json.decode(userJson!);
     print("getCurrentUser:" + userJson);
     SignInResponse user = SignInResponse.fromJson(data);

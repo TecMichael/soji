@@ -16,7 +16,7 @@ class UserStore extends ChangeNotifier {
 
 
   void initMixPanel() async{
-   // mixpanel = await Mixpanel.init("12ee3cf398f805c6b4163cc243a4b4ef", optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init("12ee3cf398f805c6b4163cc243a4b4ef", optOutTrackingDefault: false);
 
   }
 

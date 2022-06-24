@@ -102,6 +102,8 @@ class ApiService {
   }
 
   Future<String> searchCompanyByPhone(phone) async {
+    print('searching number in api service');
+
     var user = await cacheHelper.getCurrentUser();
     var key = user.response!.data!.token;
     var body = <String, dynamic>{

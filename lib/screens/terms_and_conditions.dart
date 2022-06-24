@@ -17,7 +17,7 @@ class WebViewExampleState extends State<TermsAndConditionsScreen> {
     super.initState();
     // Enable virtual display.
     if (Platform.isAndroid) WebView.platform = AndroidWebView();
-    // Provider.of<UserStore>(context,listen: false).mixpanel!.track('Terms and Condition');
+    Provider.of<UserStore>(context,listen: false).mixpanel!.track('Terms and Condition');
 
   }
 

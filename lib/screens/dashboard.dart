@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:call_log/call_log.dart';
@@ -24,7 +25,8 @@ import '../components/custom_exit_dialog.dart';
 import '../services/api_service.dart';
 import '../services/cache_helper.dart';
 import '../services/notification_service.dart';
-
+import 'package:shared_preferences_android/shared_preferences_android.dart';
+import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -33,6 +35,11 @@ Future<void> callerCallbackHandler(
   String number,
   int duration,
 ) async {
+  if (Platform.isAndroid) {
+    SharedPreferencesAndroid.registerWith();
+  } else if (Platform.isIOS) {
+    SharedPreferencesIOS.registerWith();
+  }
   print("New event received from native $event");
   switch (event) {
     case CallerEvent.incoming:
@@ -109,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       var text = "${(await Clipboard.getData(Clipboard.kTextPlain))!.text}";
       print(text + 'from clipboard');
 
-      if (text.isNotEmpty) {
+      if (text.trim().isNotEmpty) {
         NotificationService.searchData(text);
       }
     });
@@ -186,13 +193,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             exitDialog(context);
           },
           icon:  SvgPicture.asset(
-            'assets/logout.svg',
+            'assets/loggy.svg',
             color: Color(0xffFF6600),
           ),
         ),
         title: Image.asset(
           'assets/soji_logo.png',
-          height: 20,
+          height: 25,
         ),
         actions: [
           IconButton(
@@ -200,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               appBloc!.add(SearchUserRecordEvent(context: context));
             },
             icon:SvgPicture.asset(
-              'assets/refresh.svg',
+              'assets/renew.svg',
               color: Color(0xffFF6600),
             ),
           )
